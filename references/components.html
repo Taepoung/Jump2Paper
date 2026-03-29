@@ -1,0 +1,1296 @@
+<!-- ================================================================ -->
+<!-- components.html — Paper2Web 컴포넌트 라이브러리                     -->
+<!-- 필요한 섹션을 §앵커로 찾아서 복사합니다                               -->
+<!-- CSS / JS 는 §1 PAGE SHELL 내에 모두 내장됨 (별도 파일 없음)         -->
+<!-- ================================================================ -->
+
+
+<!-- ================================================================ -->
+<!-- §1 PAGE SHELL — 전체 HTML 골격                                     -->
+<!-- 4단계: 이 섹션 전체를 복사해서 새 파일의 시작점으로 사용               -->
+<!-- ================================================================ -->
+<!DOCTYPE html>
+<html lang="ko"><!-- 영어 출력 시 lang="en" -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>논문 제목 — Paper2Web</title>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── 토큰 ── */
+:root {
+  --color-bg:           #ffffff;
+  --color-bg-soft:      #f8f7f4;
+  --color-text:         #1a1a1a;
+  --color-text-muted:   #6b6b6b;
+  --color-accent:       #e8601c;
+  --color-accent-light: #fdf0e8;
+  --color-positive:     #2d7d46;
+  --color-positive-bg:  #edf7f1;
+  --color-negative:     #c0392b;
+  --color-negative-bg:  #fdf0ee;
+  --color-border:       #e0ddd8;
+  --color-code-bg:      #f4f2ee;
+
+  --font-body:  'Lora', Georgia, serif;
+  --font-ui:    'DM Sans', system-ui, sans-serif;
+  --font-code:  'JetBrains Mono', monospace;
+
+  --text-base:   17px;
+  --line-height: 1.8;
+  --content-width: 800px;
+}
+
+/* ── 리셋 & 베이스 ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: var(--text-base); }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  line-height: var(--line-height);
+}
+
+/* ── 레이아웃 ── */
+.p2w-content {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.p2w-section {
+  padding: 4rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.p2w-section-alt {
+  background: var(--color-bg-soft);
+}
+
+/* ── 타이포그래피 ── */
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-ui);
+  line-height: 1.3;
+  color: var(--color-text);
+}
+
+h1 { font-size: 2.4rem; font-weight: 600; }
+h2 { font-size: 1.7rem; font-weight: 600; margin-bottom: 1.5rem; }
+h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+
+p { margin-bottom: 1.2rem; }
+
+a { color: var(--color-accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, pre {
+  font-family: var(--font-code);
+  font-size: 0.9em;
+}
+
+pre {
+  background: var(--color-code-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+code {
+  background: var(--color-code-bg);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+}
+
+/* ── 내비게이션 ── */
+.p2w-nav {
+  position: sticky;
+  top: 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid var(--color-border);
+  z-index: 100;
+}
+
+.p2w-nav-inner {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.p2w-nav-inner::-webkit-scrollbar { display: none; }
+
+.p2w-nav a {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  padding: 0.85rem 0;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.p2w-nav a.active,
+.p2w-nav a:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* ── 진행 바 ── */
+.p2w-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--color-accent);
+  z-index: 200;
+  transition: width 0.1s linear;
+}
+
+/* ── 히어로 ── */
+.p2w-hero {
+  padding: 5rem 0 4rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.p2w-hero-meta {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+.p2w-hero h1 {
+  margin-bottom: 1.25rem;
+}
+
+.p2w-tldr {
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--color-text);
+  border-left: 3px solid var(--color-accent);
+  padding: 0.6rem 1rem;
+  margin-top: 1.5rem;
+  background: var(--color-accent-light);
+  border-radius: 0 6px 6px 0;
+}
+
+.p2w-btn {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  border-radius: 4px;
+  margin-top: 1.25rem;
+  transition: background 0.15s, color 0.15s;
+}
+
+.p2w-btn:hover {
+  background: var(--color-accent);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* ── 수식 블록 ── */
+.p2w-equation {
+  margin: 2.5rem 0;
+  padding: 1.5rem;
+  background: var(--color-bg-soft);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 8px 8px 0;
+}
+
+.p2w-equation-body {
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+
+/* 변수 테이블 */
+.p2w-var-table {
+  width: 100%;
+  margin-top: 0.75rem;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.p2w-var-table th {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.p2w-var-table td {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.p2w-var-table tr:last-child td { border-bottom: none; }
+
+/* 수식 해설 패널 */
+.p2w-equation-explain {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.93rem;
+}
+
+.p2w-explain-label {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  margin: 0.75rem 0 0.3rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--color-accent-light);
+}
+
+.p2w-explain-label:first-child { margin-top: 0; }
+
+/* ── 논문 인용 블록 ── */
+.p2w-quote {
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-accent-light);
+  padding: 0.85rem 1.1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+}
+
+.p2w-quote-translation {
+  margin-top: 0.5rem;
+  font-style: normal;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+/* ── 긍정/부정 뱃지 & 블록 ── */
+.p2w-badge {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.18rem 0.55rem;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.p2w-badge-positive {
+  color: var(--color-positive);
+  background: var(--color-positive-bg);
+}
+
+.p2w-badge-negative {
+  color: var(--color-negative);
+  background: var(--color-negative-bg);
+}
+
+.p2w-callout-positive {
+  border-left: 3px solid var(--color-positive);
+  background: var(--color-positive-bg);
+  padding: 0.85rem 1.1rem;
+  margin: 1rem 0;
+  border-radius: 0 6px 6px 0;
+}
+
+.p2w-callout-negative {
+  border-left: 3px solid var(--color-negative);
+  background: var(--color-negative-bg);
+  padding: 0.85rem 1.1rem;
+  margin: 1rem 0;
+  border-radius: 0 6px 6px 0;
+}
+
+/* ── 접을 수 있는 섹션 ── */
+.p2w-collapsible-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-ui);
+  font-weight: 500;
+  user-select: none;
+}
+
+.p2w-collapsible-header:hover { color: var(--color-accent); }
+
+.p2w-collapsible-arrow {
+  font-size: 0.75rem;
+  transition: transform 0.2s;
+}
+
+.p2w-collapsible-header.open .p2w-collapsible-arrow {
+  transform: rotate(180deg);
+}
+
+.p2w-collapsible-body {
+  padding: 1rem 0;
+}
+
+/* ── 호버 툴팁 ── */
+.p2w-term {
+  border-bottom: 1px dashed var(--color-accent);
+  cursor: help;
+  position: relative;
+}
+
+.p2w-term::after {
+  content: attr(data-def);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 5px;
+  white-space: nowrap;
+  max-width: 260px;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 50;
+}
+
+.p2w-term:hover::after { opacity: 1; }
+
+/* ── 테이블 (결과 비교 등) ── */
+.p2w-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  margin: 1.5rem 0;
+}
+
+.p2w-table th {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  background: var(--color-bg-soft);
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.p2w-table td {
+  padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.p2w-table tr.highlight td {
+  font-weight: 600;
+  color: var(--color-positive);
+  background: var(--color-positive-bg);
+}
+
+/* ── [보충] / [평가] 뱃지 ── */
+.p2w-badge-supplement {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-right: 0.3rem;
+  background: #eef3fb;
+  color: #3a6bbf;
+  border: 1px solid #b8cef0;
+}
+
+.p2w-badge-eval {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-right: 0.3rem;
+  background: #f5f0fb;
+  color: #7a47c2;
+  border: 1px solid #d0b8f0;
+}
+
+/* ── 키워드 태그 ── */
+.p2w-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.p2w-keyword {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  color: var(--color-text-muted);
+  background: var(--color-bg-soft);
+  transition: border-color 0.15s, color 0.15s;
+  text-decoration: none;
+}
+
+.p2w-keyword:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+/* 한계 대응 키워드 — 부정 계열 */
+.p2w-keyword-limit {
+  border-color: var(--color-negative);
+  color: var(--color-negative);
+  background: var(--color-negative-bg);
+}
+
+.p2w-keyword-limit:hover {
+  background: var(--color-negative);
+  color: #fff;
+}
+
+/* ── 더 찾아보기 섹션 ── */
+.p2w-explore-group {
+  margin-bottom: 2rem;
+}
+
+.p2w-explore-group h3 {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.p2w-limit-map {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.p2w-limit-map-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  background: var(--color-bg-soft);
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+
+.p2w-limit-map-desc {
+  font-size: 0.92rem;
+  color: var(--color-negative);
+}
+
+.p2w-limit-map-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+/* ── BibTeX 블록 ── */
+.p2w-bibtex {
+  position: relative;
+}
+
+.p2w-bibtex pre {
+  padding-right: 3.5rem;
+}
+
+.p2w-copy-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  padding: 0.25rem 0.6rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.p2w-copy-btn:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* ── 스크롤 리빌 애니메이션 ── */
+.p2w-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.p2w-reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 600px) {
+  :root { --text-base: 15px; }
+
+  /* 레이아웃 */
+  .p2w-content { padding: 0 1rem; }
+  .p2w-section { padding: 2.5rem 0; }
+  .p2w-hero { padding: 3rem 0 2.5rem; }
+
+  /* 타이포그래피 */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.35rem; }
+  h3 { font-size: 1.1rem; }
+
+  /* 테이블: 가로 스크롤 */
+  .p2w-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* 한계 키워드 맵: 2열 → 1열 */
+  .p2w-limit-map-item { grid-template-columns: 1fr; }
+  .p2w-limit-map-keywords { justify-content: flex-start; }
+
+  /* 코드 블록: 폰트 축소 + 터치 스크롤 */
+  pre { font-size: 0.8rem; -webkit-overflow-scrolling: touch; }
+
+  /* 내비게이션: 터치 스크롤 개선 */
+  .p2w-nav-inner { -webkit-overflow-scrolling: touch; }
+
+  /* TL;DR: 폰트 축소 */
+  .p2w-tldr { font-size: 1rem; }
+}
+  </style>
+</head>
+<body>
+
+  <div class="p2w-progress"></div>
+
+  <!-- 내비게이션 — 없는 섹션은 링크도 함께 제거 -->
+  <nav class="p2w-nav">
+    <div class="p2w-nav-inner">
+      <a href="#background">배경</a>
+      <a href="#idea">핵심 아이디어</a>
+      <a href="#method">방법론</a>
+      <a href="#results">결과</a>
+      <a href="#limits">한계</a>
+      <a href="#impact">영향력</a>
+      <a href="#qa">Q&A</a>
+    </div>
+  </nav>
+
+  <!-- 히어로 -->
+  <div class="p2w-hero p2w-content">
+    <p class="p2w-hero-meta">저자 이름 · 학술지/학회 · 연도</p>
+    <h1>논문 제목</h1>
+    <p class="p2w-tldr">관점 문장</p>
+    <a class="p2w-btn" href="https://arxiv.org/abs/..." target="_blank">arXiv →</a>
+    <div class="p2w-keywords"><!-- 키워드 5–8개 --></div>
+  </div>
+
+  <!-- 섹션: 홀수=흰 배경, 짝수=소프트 배경 교대 -->
+  <section class="p2w-section p2w-reveal" id="background">
+    <div class="p2w-content"><h2>문제의 배경 — 기존 연구의 한계</h2></div>
+  </section>
+
+  <section class="p2w-section p2w-section-alt p2w-reveal" id="idea">
+    <div class="p2w-content"><h2>이 논문의 선택 — 핵심 아이디어와 트레이드오프</h2></div>
+  </section>
+
+  <section class="p2w-section p2w-reveal" id="method">
+    <div class="p2w-content">
+      <h2>방법론</h2>
+      <h3>전체 아키텍처</h3>
+      <h3>내부 모듈 구조</h3>
+      <h3>데이터 & 워크플로우</h3>
+      <h3>수식 & 알고리즘</h3>
+      <h3>핵심 알고리즘</h3>
+      <h3>구현 세부사항</h3>
+      <h3>인터랙티브 데모</h3>
+    </div>
+  </section>
+
+  <section class="p2w-section p2w-section-alt p2w-reveal" id="results">
+    <div class="p2w-content"><h2>결과</h2></div>
+  </section>
+
+  <section class="p2w-section p2w-reveal" id="limits">
+    <div class="p2w-content"><h2>한계점 & 트레이드오프</h2></div>
+  </section>
+
+  <section class="p2w-section p2w-section-alt p2w-reveal" id="impact">
+    <div class="p2w-content"><h2>영향력 & 후속 연구</h2></div>
+  </section>
+
+  <section class="p2w-section p2w-reveal" id="qa">
+    <div class="p2w-content"><h2>Q&A — 연구자의 고민과 독자의 질문</h2></div>
+  </section>
+
+  <script>
+  // ── 진행 바 ──
+window.addEventListener('scroll', () => {
+  const el = document.querySelector('.p2w-progress');
+  if (!el) return;
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  el.style.width = (window.scrollY / total * 100) + '%';
+});
+
+// ── 스크롤 리빌 ──
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.p2w-reveal').forEach(el => revealObserver.observe(el));
+
+// ── 내비게이션 활성 섹션 추적 ──
+const navObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    const id = e.target.id;
+    const link = document.querySelector(`.p2w-nav a[href="#${id}"]`);
+    if (link) link.classList.toggle('active', e.isIntersecting);
+  });
+}, { rootMargin: '-40% 0px -55% 0px' });
+document.querySelectorAll('.p2w-section[id]').forEach(el => navObserver.observe(el));
+  </script>
+</body>
+</html>
+<!-- §1 END -->
+
+
+<!-- ================================================================ -->
+<!-- §2 BASE COMPONENTS — 기본 컴포넌트                                  -->
+<!-- ================================================================ -->
+
+<!-- §2.1 히어로 -->
+<div class="p2w-hero p2w-content">
+  <p class="p2w-hero-meta">저자 이름 · 학술지/학회 · 연도</p>
+  <h1>논문 제목</h1>
+  <p class="p2w-tldr">논문 전체를 관통하는 핵심 관점 또는 저자의 원문 인용</p>
+  <a class="p2w-btn" href="https://arxiv.org/abs/..." target="_blank">arXiv →</a>
+  <div class="p2w-keywords">
+    <a class="p2w-keyword" href="https://scholar.google.com/scholar?q=keyword" target="_blank">keyword</a>
+    <!-- 키워드 5–8개 -->
+  </div>
+</div>
+<!-- §2.1 END -->
+
+<!-- §2.2 수식 블록 (변수 테이블 + 해설 항상 표시) -->
+<div class="p2w-equation p2w-reveal">
+  <div class="p2w-equation-body">
+    \[ 수식 \]
+  </div>
+  <table class="p2w-var-table">
+    <thead><tr><th>변수</th><th>의미</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td><code>x</code></td><td>의미</td><td>비고</td></tr>
+    </tbody>
+  </table>
+  <div class="p2w-equation-explain">
+    <p class="p2w-explain-label">직관적 해설</p>
+    <div class="p2w-explain-panel">직관적 해설 내용</div>
+    <p class="p2w-explain-label">수학적 유도</p>
+    <div class="p2w-explain-panel">수학적 유도 내용</div>
+  </div>
+</div>
+<!-- §2.2 END -->
+
+<!-- §2.3 논문 인용 -->
+<blockquote class="p2w-quote">
+  "논문 원문 인용"
+  <p class="p2w-quote-translation">번역 (필요한 경우)</p>
+</blockquote>
+<!-- §2.3 END -->
+
+<!-- §2.4 [보충] / [평가] 인라인 뱃지 -->
+<p><span class="p2w-badge-supplement">보충</span> 배경 설명 내용</p>
+<p><span class="p2w-badge-eval">평가</span> 논문은 명시하지 않지만...</p>
+<!-- §2.4 END -->
+
+<!-- §2.5 callout (긍정 / 부정) -->
+<div class="p2w-callout-positive">
+  <span class="p2w-badge p2w-badge-positive">기여점</span> 내용
+</div>
+<div class="p2w-callout-negative">
+  <span class="p2w-badge p2w-badge-negative">한계</span> 내용
+</div>
+<!-- §2.5 END -->
+
+<!-- §2.6 결과 테이블 -->
+<table class="p2w-table">
+  <thead>
+    <tr><th>방법</th><th>지표 1</th><th>지표 2</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="p2w-badge p2w-badge-negative">Baseline</span> Method A</td>
+      <td>72.3</td><td>68.1</td>
+    </tr>
+    <tr class="highlight">
+      <td><span class="p2w-badge p2w-badge-positive">Ours</span> Proposed Method</td>
+      <td><strong>81.4</strong></td><td><strong>78.9</strong></td>
+    </tr>
+  </tbody>
+</table>
+<!-- §2.6 END -->
+
+<!-- §2.7 한계점 — 한계별 대응 키워드 -->
+<div class="p2w-callout-negative">
+  <span class="p2w-badge p2w-badge-negative">한계</span>
+  한계 설명
+  <div class="p2w-keywords" style="margin-top:0.6rem;">
+    <a class="p2w-keyword p2w-keyword-limit" href="https://scholar.google.com/scholar?q=keyword" target="_blank">keyword</a>
+  </div>
+</div>
+<!-- §2.7 END -->
+
+<!-- §2.8 영향력 & 후속 연구 — 관련 분야 키워드 -->
+<div class="p2w-explore-group">
+  <h3>관련 분야 더 찾아보기</h3>
+  <div class="p2w-keywords">
+    <a class="p2w-keyword" href="https://scholar.google.com/scholar?q=keyword" target="_blank">keyword</a>
+    <!-- 5–8개 -->
+  </div>
+</div>
+<!-- §2.8 END -->
+
+<!-- §2.10 호버 툴팁 -->
+<span class="p2w-term" data-def="간단한 정의">용어</span>
+<!-- §2.10 END -->
+
+<!-- ================================================================ -->
+<!-- §3 VISUALIZATION & INTERACTIVE PATTERNS                          -->
+<!--                                                                  -->
+<!-- 선택 기준:                                                         -->
+<!--   전체 아키텍처 구조    → §3.1 블록 다이어그램                        -->
+<!--   모듈 내부 드릴다운    → §3.2 계층형 드릴다운                        -->
+<!--   데이터 변환 흐름      → §3.3 데이터 플로우 (사용자 제어 버튼)        -->
+<!--   알고리즘 단계 실행    → §3.4 스텝 플레이어 (이전/다음)              -->
+<!--   수식 파라미터 조작    → §3.5 수식 슬라이더 + Canvas               -->
+<!--   가중치/어텐션 시각화  → §3.6 히트맵                               -->
+<!--   이전 vs 제안 비교     → §3.7 비교 슬라이더 (드래그)                -->
+<!--   수치 결과 비교        → §3.8 Chart.js 바/라인 차트                -->
+<!--   벡터/임베딩 공간      → §3.9 임베딩 산점도                         -->
+<!--   트리/그래프 구조      → §3.10 노드-엣지 그래프                     -->
+<!--   행렬 연산            → §3.11 행렬 시각화                          -->
+<!--   확률 분포            → §3.12 분포 플롯                            -->
+<!--   핵심 수치 강조        → §3.13 메트릭 카드                          -->
+<!-- ================================================================ -->
+
+<!-- §3.1 블록 다이어그램 (아키텍처) -->
+<!-- 각 블록 클릭 시 data-desc 내용을 하단 패널에 표시 -->
+<div class="p2w-viz-wrap">
+  <svg id="arch-svg" viewBox="0 0 700 220" style="width:100%">
+    <defs>
+      <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+        <polygon points="0 0,8 3,0 6" fill="var(--color-accent)"/>
+      </marker>
+    </defs>
+    <g class="arch-block" data-desc="입력 설명" style="cursor:pointer" onclick="p2wShowDesc(this)">
+      <rect x="20" y="85" width="110" height="50" rx="6"
+            fill="var(--color-bg-soft)" stroke="var(--color-border)" stroke-width="1.5"/>
+      <text x="75" y="115" text-anchor="middle" dominant-baseline="middle"
+            font-family="var(--font-ui)" font-size="13" fill="var(--color-text)">Input</text>
+    </g>
+    <line x1="130" y1="110" x2="190" y2="110"
+          stroke="var(--color-accent)" stroke-width="1.5" marker-end="url(#arr)"/>
+    <g class="arch-block" data-desc="핵심 모듈 설명" style="cursor:pointer" onclick="p2wShowDesc(this)">
+      <rect x="190" y="80" width="130" height="60" rx="6"
+            fill="var(--color-accent-light)" stroke="var(--color-accent)" stroke-width="2"/>
+      <text x="255" y="115" text-anchor="middle" dominant-baseline="middle"
+            font-family="var(--font-ui)" font-size="13" font-weight="600"
+            fill="var(--color-accent)">Core Module</text>
+    </g>
+  </svg>
+  <div id="arch-desc" class="p2w-viz-desc" hidden></div>
+</div>
+<style>
+.p2w-viz-wrap { margin: 2rem 0; }
+.p2w-viz-desc {
+  margin-top: 0.75rem; padding: 0.75rem 1rem;
+  background: var(--color-accent-light);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 6px 6px 0; font-size: 0.9rem;
+}
+.arch-block:hover rect { filter: brightness(0.95); }
+</style>
+<script>
+function p2wShowDesc(block) {
+  const panel = block.closest('.p2w-viz-wrap').querySelector('.p2w-viz-desc');
+  const desc = block.dataset.desc;
+  if (panel.textContent === desc && !panel.hidden) { panel.hidden = true; return; }
+  panel.textContent = desc; panel.hidden = false;
+}
+</script>
+<!-- §3.1 END -->
+
+<!-- §3.2 계층형 드릴다운 -->
+<!-- 버튼으로 레벨 전환, 각 레벨은 SVG <g> 블록으로 show/hide -->
+<div class="p2w-drilldown">
+  <div class="p2w-drilldown-nav">
+    <button class="p2w-drill-btn active" onclick="p2wDrill(0, this)">전체 구조</button>
+    <button class="p2w-drill-btn" onclick="p2wDrill(1, this)">서브모듈 내부</button>
+    <button class="p2w-drill-btn" onclick="p2wDrill(2, this)">핵심 연산 내부</button>
+  </div>
+  <svg viewBox="0 0 700 300" style="width:100%">
+    <g id="drill-0"><!-- 레벨 0: 전체 구조 SVG --></g>
+    <g id="drill-1" style="display:none"><!-- 레벨 1: 서브모듈 SVG --></g>
+    <g id="drill-2" style="display:none"><!-- 레벨 2: 핵심 연산 SVG --></g>
+  </svg>
+</div>
+<style>
+.p2w-drilldown-nav { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.p2w-drill-btn {
+  background: none; border: 1px solid var(--color-accent); color: var(--color-accent);
+  font-family: var(--font-ui); font-size: 0.82rem; padding: 0.28rem 0.75rem;
+  border-radius: 4px; cursor: pointer;
+}
+.p2w-drill-btn.active, .p2w-drill-btn:hover { background: var(--color-accent); color: #fff; }
+</style>
+<script>
+function p2wDrill(level, btn) {
+  btn.closest('.p2w-drilldown').querySelectorAll('[id^="drill-"]')
+    .forEach((g, i) => g.style.display = i === level ? '' : 'none');
+  btn.closest('.p2w-drilldown-nav').querySelectorAll('button')
+    .forEach((b, i) => b.classList.toggle('active', i === level));
+}
+</script>
+<!-- §3.2 END -->
+
+<!-- §3.3 데이터 플로우 (사용자 제어) -->
+<!-- SVG 위를 점이 이동, 각 스테이지에서 shape/변환 설명 -->
+<!-- 자동 재생보다 사용자 제어 우선 (▶ 재생 / ↺ 처음으로) -->
+<div class="p2w-flow">
+  <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
+    <button class="p2w-drill-btn" onclick="p2wFlowPlay(this)">▶ 재생</button>
+    <button class="p2w-drill-btn" onclick="p2wFlowReset()">↺ 처음으로</button>
+  </div>
+  <svg id="flow-svg" viewBox="0 0 700 120" style="width:100%">
+    <rect x="20"  y="40" width="100" height="40" rx="5" fill="var(--color-bg-soft)" stroke="var(--color-border)" stroke-width="1.5"/>
+    <text x="70"  y="65" text-anchor="middle" font-family="var(--font-ui)" font-size="12" fill="var(--color-text)">Input</text>
+    <rect x="200" y="40" width="100" height="40" rx="5" fill="var(--color-bg-soft)" stroke="var(--color-border)" stroke-width="1.5"/>
+    <text x="250" y="65" text-anchor="middle" font-family="var(--font-ui)" font-size="12" fill="var(--color-text)">Stage 2</text>
+    <rect x="380" y="40" width="100" height="40" rx="5" fill="var(--color-accent-light)" stroke="var(--color-accent)" stroke-width="2"/>
+    <text x="430" y="65" text-anchor="middle" font-family="var(--font-ui)" font-size="12" font-weight="600" fill="var(--color-accent)">Core</text>
+    <rect x="560" y="40" width="100" height="40" rx="5" fill="var(--color-bg-soft)" stroke="var(--color-border)" stroke-width="1.5"/>
+    <text x="610" y="65" text-anchor="middle" font-family="var(--font-ui)" font-size="12" fill="var(--color-text)">Output</text>
+    <line x1="120" y1="60" x2="200" y2="60" stroke="var(--color-border)" stroke-width="1.5"/>
+    <line x1="300" y1="60" x2="380" y2="60" stroke="var(--color-border)" stroke-width="1.5"/>
+    <line x1="480" y1="60" x2="560" y2="60" stroke="var(--color-border)" stroke-width="1.5"/>
+    <circle id="flow-dot" cx="70" cy="60" r="7" fill="var(--color-accent)" opacity="0.9"/>
+  </svg>
+  <div id="flow-desc" class="p2w-viz-desc" style="min-height:2.5rem"></div>
+</div>
+<script>
+const FLOW_STAGES = [
+  { x: 70,  desc: '원본 입력. shape: [B, T]' },
+  { x: 250, desc: '2단계 변환. shape: [B, T, D]' },
+  { x: 430, desc: '핵심 연산. shape: [B, T, D] (값이 문맥 반영)' },
+  { x: 610, desc: '최종 출력. shape: [B, T, D]' },
+];
+let flowStage = 0, flowTimer = null;
+function p2wFlowPlay(btn) {
+  if (flowTimer) { clearInterval(flowTimer); flowTimer = null; btn.textContent = '▶ 재생'; return; }
+  btn.textContent = '⏸ 일시정지';
+  flowTimer = setInterval(() => {
+    flowStage = (flowStage + 1) % FLOW_STAGES.length;
+    p2wFlowGo(flowStage);
+    if (flowStage === FLOW_STAGES.length - 1) { clearInterval(flowTimer); flowTimer = null; btn.textContent = '▶ 재생'; }
+  }, 1400);
+}
+function p2wFlowReset() {
+  clearInterval(flowTimer); flowTimer = null; flowStage = 0; p2wFlowGo(0);
+  const playBtn = document.querySelector('.p2w-flow [onclick^="p2wFlowPlay"]');
+  if (playBtn) playBtn.textContent = '▶ 재생';
+}
+function p2wFlowGo(i) {
+  const dot = document.getElementById('flow-dot');
+  dot.style.transition = 'cx 0.6s ease';
+  dot.setAttribute('cx', FLOW_STAGES[i].x);
+  const desc = document.getElementById('flow-desc');
+  desc.textContent = FLOW_STAGES[i].desc; desc.hidden = false;
+}
+</script>
+<!-- §3.3 END -->
+
+<!-- §3.4 스텝 플레이어 (이전/다음) -->
+<!-- 알고리즘 단계별 실행, 수식 유도 과정 -->
+<div class="p2w-stepper">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+    <span id="step-label" style="font-family:var(--font-ui);font-size:0.85rem;color:var(--color-text-muted)">스텝 1 / 2</span>
+    <div style="display:flex;gap:0.4rem">
+      <button class="p2w-drill-btn" onclick="p2wStep(-1)">← 이전</button>
+      <button class="p2w-drill-btn" onclick="p2wStep(1)">다음 →</button>
+    </div>
+  </div>
+  <svg id="step-svg" viewBox="0 0 600 200" style="width:100%">
+    <rect id="s-box1" x="20" y="80" width="120" height="40" rx="5"
+          fill="var(--color-bg-soft)" stroke="var(--color-border)" stroke-width="1.5"/>
+    <rect id="s-box2" x="240" y="80" width="120" height="40" rx="5"
+          fill="var(--color-bg-soft)" stroke="var(--color-border)" stroke-width="1.5"/>
+  </svg>
+  <div id="step-desc" class="p2w-viz-desc"></div>
+</div>
+<script>
+(function() {
+const STEPS = [
+  { desc: '① 입력 X를 받습니다.', highlight: ['s-box1'], fn: () => {} },
+  { desc: '② 선형 변환 W를 적용합니다.', highlight: ['s-box1', 's-box2'], fn: () => {} },
+];
+let currentStep = 0;
+window.p2wStep = function(dir) {
+  currentStep = Math.max(0, Math.min(STEPS.length - 1, currentStep + dir));
+  const s = STEPS[currentStep];
+  document.querySelectorAll('[id^="s-box"]').forEach(el => {
+    el.setAttribute('fill', 'var(--color-bg-soft)');
+    el.setAttribute('stroke', 'var(--color-border)');
+  });
+  s.highlight.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.setAttribute('fill', 'var(--color-accent-light)'); el.setAttribute('stroke', 'var(--color-accent)'); }
+  });
+  s.fn?.();
+  document.getElementById('step-desc').textContent = s.desc;
+  document.getElementById('step-label').textContent = `스텝 ${currentStep + 1} / ${STEPS.length}`;
+};
+window.p2wStep(0);
+})();
+</script>
+<!-- §3.4 END -->
+
+<!-- §3.5 수식 인터랙티브 슬라이더 -->
+<!-- <input range> + Canvas 실시간 갱신 -->
+<div style="margin:2rem 0">
+  <div style="margin-bottom:0.75rem">
+    <label style="display:flex;flex-direction:column;gap:0.3rem;font-family:var(--font-ui);font-size:0.9rem">
+      <span>temperature <strong id="temp-val" style="color:var(--color-accent)">1.0</strong></span>
+      <input type="range" min="0.1" max="3" step="0.1" value="1.0"
+             style="accent-color:var(--color-accent);width:100%;max-width:300px"
+             oninput="p2wUpdateSoftmax(this.value)">
+    </label>
+  </div>
+  <canvas id="softmax-canvas" width="600" height="200"
+          style="width:100%;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg-soft)"></canvas>
+  <p style="margin-top:0.6rem;font-size:0.85rem;color:var(--color-text-muted)">파라미터 설명</p>
+</div>
+<script>
+function p2wUpdateSoftmax(temp) {
+  document.getElementById('temp-val').textContent = parseFloat(temp).toFixed(1);
+  const canvas = document.getElementById('softmax-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const logits = [2.0, 1.0, 0.5, -0.5, -1.5];
+  const scaled = logits.map(v => v / parseFloat(temp));
+  const maxV = Math.max(...scaled);
+  const exps = scaled.map(v => Math.exp(v - maxV));
+  const sum = exps.reduce((a, b) => a + b, 0);
+  const probs = exps.map(v => v / sum);
+  ctx.clearRect(0, 0, W, H);
+  const barW = W / probs.length;
+  probs.forEach((p, i) => {
+    const barH = p * (H - 40);
+    ctx.fillStyle = `rgba(232, 96, 28, ${0.4 + p * 0.6})`;
+    ctx.fillRect(i * barW + 10, H - barH - 20, barW - 20, barH);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText((p * 100).toFixed(1) + '%', i * barW + barW / 2, H - barH - 25);
+  });
+}
+p2wUpdateSoftmax(1.0);
+</script>
+<!-- §3.5 END -->
+
+<!-- §3.6 히트맵 -->
+<!-- Attention 가중치, 유사도 행렬, confusion matrix -->
+<!-- 사용: p2wDrawHeatmap('heatmap-canvas', matrix, rowLabels, colLabels) -->
+<div style="position:relative;margin:2rem 0">
+  <canvas id="heatmap-canvas" width="500" height="500"
+          style="width:100%;max-width:400px;display:block;cursor:crosshair"></canvas>
+</div>
+<script>
+function p2wDrawHeatmap(canvasId, matrix, rowLabels, colLabels) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const n = matrix.length, m = matrix[0].length;
+  const pad = 60;
+  const cellW = (canvas.width - pad) / m;
+  const cellH = (canvas.height - pad) / n;
+  const maxVal = Math.max(...matrix.flat());
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  matrix.forEach((row, i) => {
+    row.forEach((val, j) => {
+      const intensity = val / maxVal;
+      const r = Math.round(255 - (255 - 232) * intensity);
+      const g = Math.round(255 - (255 - 96) * intensity);
+      const b = Math.round(255 - (255 - 28) * intensity);
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillRect(pad + j * cellW, i * cellH, cellW - 1, cellH - 1);
+      if (cellW > 30) {
+        ctx.fillStyle = intensity > 0.6 ? '#fff' : '#1a1a1a';
+        ctx.font = `${Math.min(cellW * 0.35, 13)}px monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillText(val.toFixed(2), pad + j * cellW + cellW / 2, i * cellH + cellH / 2 + 4);
+      }
+    });
+    if (rowLabels) {
+      ctx.fillStyle = '#6b6b6b'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText(rowLabels[i], pad - 6, i * cellH + cellH / 2 + 4);
+    }
+  });
+  if (colLabels) {
+    colLabels.forEach((label, j) => {
+      ctx.fillStyle = '#6b6b6b'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+      ctx.save();
+      ctx.translate(pad + j * cellW + cellW / 2, n * cellH + 14);
+      ctx.fillText(label, 0, 0); ctx.restore();
+    });
+  }
+}
+</script>
+<!-- §3.6 END -->
+
+<!-- §3.7 비교 슬라이더 (이전 vs 제안) -->
+<!-- 가운데 divider를 드래그해서 좌우 비율 조절 -->
+<div class="p2w-compare" id="compare-1">
+  <div class="p2w-compare-left">
+    <div class="p2w-compare-label">기존 방법</div>
+    <svg viewBox="0 0 300 200" style="width:100%;height:200px"><!-- 기존 결과 --></svg>
+  </div>
+  <div class="p2w-compare-right">
+    <div class="p2w-compare-label p2w-compare-label-right">제안 방법</div>
+    <svg viewBox="0 0 300 200" style="width:100%;height:200px"><!-- 제안 결과 --></svg>
+  </div>
+  <div class="p2w-compare-handle"></div>
+</div>
+<style>
+.p2w-compare { position: relative; display: flex; overflow: hidden; border: 1px solid var(--color-border); border-radius: 8px; margin: 2rem 0; user-select: none; }
+.p2w-compare-left { width: 50%; overflow: hidden; flex-shrink: 0; border-right: 2px solid var(--color-accent); }
+.p2w-compare-right { flex: 1; }
+.p2w-compare-label { position: absolute; top: 0.5rem; left: 0.5rem; font-family: var(--font-ui); font-size: 0.78rem; padding: 0.2rem 0.5rem; background: var(--color-negative-bg); color: var(--color-negative); border-radius: 4px; }
+.p2w-compare-label-right { left: auto; right: 0.5rem; background: var(--color-positive-bg); color: var(--color-positive); }
+.p2w-compare-handle { position: absolute; left: 50%; top: 0; bottom: 0; width: 20px; transform: translateX(-50%); cursor: col-resize; display: flex; align-items: center; justify-content: center; }
+.p2w-compare-handle::after { content: '↔'; background: var(--color-accent); color: #fff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+</style>
+<script>
+document.querySelectorAll('.p2w-compare').forEach(el => {
+  const handle = el.querySelector('.p2w-compare-handle');
+  const left = el.querySelector('.p2w-compare-left');
+  let dragging = false;
+  handle.addEventListener('mousedown', () => dragging = true);
+  document.addEventListener('mouseup', () => dragging = false);
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const rect = el.getBoundingClientRect();
+    const pct = Math.max(10, Math.min(90, (e.clientX - rect.left) / rect.width * 100));
+    left.style.width = pct + '%'; handle.style.left = pct + '%';
+  });
+  handle.addEventListener('touchmove', e => {
+    const rect = el.getBoundingClientRect();
+    const pct = Math.max(10, Math.min(90, (e.touches[0].clientX - rect.left) / rect.width * 100));
+    left.style.width = pct + '%'; handle.style.left = pct + '%';
+  });
+});
+</script>
+<!-- §3.7 END -->
+
+<!-- §3.8 Chart.js 바/라인 차트 -->
+<!-- Chart.js CDN 이미 page shell에 포함됨 -->
+<canvas id="result-chart" style="max-height:300px;margin:2rem 0"></canvas>
+<script>
+// 바 차트 — 방법별 성능 비교
+new Chart(document.getElementById('result-chart'), {
+  type: 'bar',
+  data: {
+    labels: ['Method A', 'Method B', 'Ours'],
+    datasets: [{
+      data: [72.3, 75.8, 81.4],
+      backgroundColor: ['rgba(192,57,43,0.5)', 'rgba(192,57,43,0.5)', 'rgba(45,125,70,0.8)'],
+      borderColor: ['#c0392b', '#c0392b', '#2d7d46'],
+      borderWidth: 2,
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y}%` } }
+    },
+    scales: {
+      y: { beginAtZero: false, min: 65, grid: { color: 'rgba(0,0,0,0.05)' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+// 라인 차트 — 학습 곡선 (대체):
+// new Chart(el, { type: 'line', data: { labels: [...epochs], datasets: [
+//   { label: 'Train Loss', data: [...], borderColor: '#e8601c', fill: true, tension: 0.3 },
+//   { label: 'Val Loss',   data: [...], borderColor: '#6b6b6b', borderDash: [5,5] }
+// ]}});
+</script>
+<!-- §3.8 END -->
+
+<!-- §3.9 임베딩 산점도 -->
+<!-- 벡터 공간, 클러스터링, t-SNE/PCA 결과 -->
+<!-- 사용: p2wScatter('scatter-canvas', points, labels, colors) -->
+<canvas id="scatter-canvas" width="500" height="400"
+        style="width:100%;border:1px solid var(--color-border);border-radius:6px"></canvas>
+<script>
+function p2wScatter(canvasId, points, labels, colors) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height, pad = 30;
+  const xs = points.map(p => p.x), ys = points.map(p => p.y);
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+  const yMin = Math.min(...ys), yMax = Math.max(...ys);
+  const toX = x => pad + (x - xMin) / (xMax - xMin) * (W - pad * 2);
+  const toY = y => H - pad - (y - yMin) / (yMax - yMin) * (H - pad * 2);
+  ctx.clearRect(0, 0, W, H);
+  points.forEach(p => {
+    ctx.beginPath(); ctx.arc(toX(p.x), toY(p.y), 5, 0, Math.PI * 2);
+    ctx.fillStyle = colors[p.group] || '#e8601c'; ctx.fill();
+  });
+  if (labels) {
+    ctx.font = '10px sans-serif'; ctx.fillStyle = '#6b6b6b';
+    points.forEach((p, i) => ctx.fillText(labels[i], toX(p.x) + 7, toY(p.y) + 4));
+  }
+}
+// 사용 예: p2wScatter('scatter-canvas', [{x:1,y:2,group:0},...], ['A','B',...], ['#e8601c','#2d7d46']);
+</script>
+<!-- §3.9 END -->
+
+<!-- §3.10 노드-엣지 그래프 -->
+<!-- 계산 그래프, GNN 입력, 트리 구조 -->
+<svg id="graph-svg" viewBox="0 0 600 300" style="width:100%">
+  <defs>
+    <marker id="garr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="var(--color-border)"/>
+    </marker>
+  </defs>
+  <!-- 엣지 -->
+  <line x1="100" y1="150" x2="300" y2="80"
+        stroke="var(--color-border)" stroke-width="1.5" marker-end="url(#garr)"/>
+  <!-- 엣지 레이블 -->
+  <text x="195" y="105" font-family="var(--font-ui)" font-size="11"
+        fill="var(--color-text-muted)" text-anchor="middle">0.8</text>
+  <!-- 노드 -->
+  <circle cx="100" cy="150" r="24" fill="var(--color-accent-light)" stroke="var(--color-accent)" stroke-width="2"/>
+  <text x="100" y="154" text-anchor="middle" dominant-baseline="middle"
+        font-family="var(--font-ui)" font-size="12" fill="var(--color-accent)">A</text>
+  <circle cx="300" cy="80" r="24" fill="var(--color-bg-soft)" stroke="var(--color-border)" stroke-width="1.5"/>
+  <text x="300" y="84" text-anchor="middle" dominant-baseline="middle"
+        font-family="var(--font-ui)" font-size="12" fill="var(--color-text)">B</text>
+</svg>
+<!-- §3.10 END -->
+
+<!-- §3.11 행렬 시각화 -->
+<!-- 행렬 곱, 어텐션 스코어, 선형 변환 -->
+<!-- 사용: p2wDrawMatrix(svgGroupId, matrix, x0, y0, cellSize, highlightCell) -->
+<svg id="matrix-svg" viewBox="0 0 500 200" style="width:100%">
+  <g id="mat-A"><!-- p2wDrawMatrix('mat-A', matrix, 20, 60, 40, null) --></g>
+  <text x="210" y="105" font-family="var(--font-ui)" font-size="20"
+        fill="var(--color-accent)" text-anchor="middle">×</text>
+  <g id="mat-B"><!-- p2wDrawMatrix('mat-B', matrix, 230, 60, 40, null) --></g>
+  <text x="365" y="105" font-family="var(--font-ui)" font-size="20"
+        fill="var(--color-text-muted)" text-anchor="middle">=</text>
+  <g id="mat-C"><!-- p2wDrawMatrix('mat-C', matrix, 385, 60, 40, null) --></g>
+</svg>
+<script>
+function p2wDrawMatrix(svgGroupId, matrix, x0, y0, cellSize, highlightCell) {
+  const g = document.getElementById(svgGroupId);
+  g.innerHTML = '';
+  matrix.forEach((row, i) => {
+    row.forEach((val, j) => {
+      const isHL = highlightCell && highlightCell[0] === i && highlightCell[1] === j;
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x0 + j * cellSize); rect.setAttribute('y', y0 + i * cellSize);
+      rect.setAttribute('width', cellSize - 2); rect.setAttribute('height', cellSize - 2);
+      rect.setAttribute('rx', '3');
+      rect.setAttribute('fill', isHL ? 'var(--color-accent-light)' : 'var(--color-bg-soft)');
+      rect.setAttribute('stroke', isHL ? 'var(--color-accent)' : 'var(--color-border)');
+      rect.setAttribute('stroke-width', isHL ? '2' : '1');
+      g.appendChild(rect);
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', x0 + j * cellSize + cellSize / 2 - 1);
+      text.setAttribute('y', y0 + i * cellSize + cellSize / 2);
+      text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+      text.setAttribute('font-family', 'monospace'); text.setAttribute('font-size', '11');
+      text.setAttribute('fill', isHL ? 'var(--color-accent)' : 'var(--color-text)');
+      text.textContent = typeof val === 'number' ? val.toFixed(1) : val;
+      g.appendChild(text);
+    });
+  });
+}
+</script>
+<!-- §3.11 END -->
+
+<!-- §3.12 분포 플롯 -->
+<!-- 정규분포, 확률 밀도 함수, 손실 분포 -->
+<!-- 사용: p2wDrawGaussian('dist-canvas', mean, std) -->
+<canvas id="dist-canvas" width="600" height="200"
+        style="width:100%;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg-soft)"></canvas>
+<script>
+function p2wDrawGaussian(canvasId, mean, std) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const xMin = mean - 4 * std, xMax = mean + 4 * std;
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = '#e0ddd8'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H - 20); ctx.lineTo(W, H - 20); ctx.stroke();
+  const toX = x => (x - xMin) / (xMax - xMin) * W;
+  const pdf = x => Math.exp(-0.5 * ((x - mean) / std) ** 2) / (std * Math.sqrt(2 * Math.PI));
+  const maxPdf = pdf(mean);
+  const toY = p => (H - 20) - (p / maxPdf) * (H - 40);
+  const steps = 200;
+  ctx.fillStyle = 'rgba(232, 96, 28, 0.12)';
+  ctx.beginPath(); ctx.moveTo(toX(xMin), H - 20);
+  for (let i = 0; i <= steps; i++) {
+    const x = xMin + (i / steps) * (xMax - xMin);
+    ctx.lineTo(toX(x), toY(pdf(x)));
+  }
+  ctx.lineTo(W, H - 20); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.strokeStyle = '#e8601c'; ctx.lineWidth = 2.5;
+  for (let i = 0; i <= steps; i++) {
+    const x = xMin + (i / steps) * (xMax - xMin);
+    i === 0 ? ctx.moveTo(toX(x), toY(pdf(x))) : ctx.lineTo(toX(x), toY(pdf(x)));
+  }
+  ctx.stroke();
+}
+// 사용 예: p2wDrawGaussian('dist-canvas', 0, 1);
+</script>
+<!-- §3.12 END -->
+
+<!-- §3.13 메트릭 카드 (핵심 수치 강조) -->
+<!-- 논문의 핵심 수치 2–4개를 카드로 강조 -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin:2rem 0">
+  <div style="background:var(--color-bg-soft);border:1px solid var(--color-accent);border-radius:8px;padding:1.5rem;text-align:center">
+    <div style="font-size:2.5rem;font-weight:800;color:var(--color-accent);font-family:var(--font-ui)">81.4%</div>
+    <div style="font-size:0.85rem;color:var(--color-text-muted);margin-top:0.25rem;font-family:var(--font-ui)">지표명</div>
+    <div style="font-size:0.75rem;color:var(--color-text-muted);margin-top:0.5rem">기존 대비 맥락</div>
+  </div>
+  <div style="background:var(--color-bg-soft);border:1px solid var(--color-border);border-radius:8px;padding:1.5rem;text-align:center">
+    <div style="font-size:2.5rem;font-weight:800;color:var(--color-positive);font-family:var(--font-ui)">2.3×</div>
+    <div style="font-size:0.85rem;color:var(--color-text-muted);margin-top:0.25rem;font-family:var(--font-ui)">지표명</div>
+    <div style="font-size:0.75rem;color:var(--color-text-muted);margin-top:0.5rem">맥락 설명</div>
+  </div>
+</div>
+<!-- §3.13 END -->
