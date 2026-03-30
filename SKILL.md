@@ -91,7 +91,7 @@ sed -n '793,821p' references/components.html | tr -d '\0'
 
 ---
 
-## 3단계
+## 3단계 — 논문 파싱
 
 ### 파싱 원칙
 
