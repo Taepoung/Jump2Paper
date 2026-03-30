@@ -62,42 +62,9 @@ argument-hint: "Language (e.g. 한국어, English)"
 
 ---
 
-## 1단계 — 출력 언어 결정
 
-인자로 언어가 주어지면 해당 언어로 전체 페이지를 구성하세요. 주어지지 않으면 한국어로 작성하세요.
 
-**언어 처리 원칙:**
-- 설명, 해설, UI 텍스트는 모두 지정된 언어로 작성
-- 논문 고유명사(모델명, 알고리즘명, 데이터셋명 등)는 원문 그대로 유지 (번역 금지)
-  - 예: "Transformer", "BERT", "ImageNet", "softmax" → 그대로
-- 일반 기술 용어를 번역할 경우, 반드시 원문을 괄호로 병기
-  - 예: 어텐션 메커니즘 (attention mechanism), 잔차 연결 (residual connection)
-- 논문 원문 인용은 원어 그대로 유지하고, 번역이 필요하면 인용 아래에 별도로 제공
-
----
-
-## 2단계 — 논문 파싱
-
-### 입력 유형 별 처리
-
-논문(PDF / LaTeX 소스) 중 하나가 제공되지 않았으면 먼저 요청하고 진행합니다.
-**논문의 내용은 5단계에서 읽습니다.**
-
-#### PDF 업로드
-사용자가 `.pdf` 파일을 업로드하면 `/mnt/user-data/uploads/` 경로에 있습니다.
-```bash
-pdfinfo paper.pdf
-pdftotext -layout paper.pdf /tmp/paper.txt
-# 그림, 결과 표가 있는 페이지를 래스터화
-pdftoppm -jpeg -r 150 paper.pdf /tmp/page
-```
-
-#### LaTeX 소스
-`main.tex`을 읽고 `\title`, `\abstract`, `\section`, `\begin{equation}`, 그림에 집중하세요.
-
----
-
-## 3단계 — HTML 초기화
+## 1단계 — HTML 초기화
 
 콘텐츠를 쓰기 전에 HTML 파일을 먼저 만듭니다.
 `references/` 경로는 **현재 작업 디렉토리 기준**입니다. SKILL.md가 있는 폴더에서 실행해야 합니다.
@@ -111,7 +78,7 @@ sed -n '9,773p' references/components.html | tr -d '\0' > paper.html
 
 ---
 
-## 4단계 — 디자인 시스템 안내
+## 2단계 — 디자인 시스템 안내
 
 **지금 `references/design_system.md`를 읽으세요.**
 
@@ -126,10 +93,45 @@ sed -n '793,821p' references/components.html | tr -d '\0'
 
 ---
 
+## 3단계 — 논문 파싱
+
+### 입력 유형 별 처리
+
+논문(PDF / LaTeX 소스) 중 하나가 제공되지 않았으면 먼저 요청하고 진행합니다.
+
+#### PDF 업로드
+사용자가 `.pdf` 파일을 업로드하면 `/mnt/user-data/uploads/` 경로에 있습니다.
+```bash
+pdfinfo paper.pdf
+pdftotext -layout paper.pdf /tmp/paper.txt
+# 그림, 결과 표가 있는 페이지를 래스터화
+pdftoppm -jpeg -r 150 paper.pdf /tmp/page
+```
+
+#### LaTeX 소스
+`main.tex`을 읽고 `\title`, `\abstract`, `\section`, `\begin{equation}`, 그림에 집중하세요.
+
+**Reference 또는 bibliography 부분 전까지만 읽고 다음 단계로 넘어갑니다**
+
+---
+
+## 4단계 — 출력 언어 결정
+
+인자로 언어가 주어지면 해당 언어로 전체 페이지를 구성하세요. 주어지지 않으면 한국어로 작성하세요.
+
+**언어 처리 원칙:**
+- 설명, 해설, UI 텍스트는 모두 지정된 언어로 작성
+- 논문 고유명사(모델명, 알고리즘명, 데이터셋명 등)는 원문 그대로 유지 (번역 금지)
+  - 예: "Transformer", "BERT", "ImageNet", "softmax" → 그대로
+- 일반 기술 용어를 번역할 경우, 반드시 원문을 괄호로 병기
+  - 예: 어텐션 메커니즘 (attention mechanism), 잔차 연결 (residual connection)
+- 논문 원문 인용은 원어 그대로 유지하고, 번역이 필요하면 인용 아래에 별도로 제공
+
+---
+
 ## 5단계 — 내용 작성
 
-논문을 읽고 추가적인 정보를 수집하면서 HTML 파일에 작성합니다.
-**Reference, Appendix 부분은 읽지 않습니다**
+읽은 논문의 본문을 바탕으로 추가적인 정보를 수집하면서 HTML 파일에 작성합니다.
 
 인터랙티브 컴포넌트의 CSS/JS는 항상 별도 `<style>`/`<script>` 태그로 분리해서 추가합니다.
 
@@ -319,7 +321,10 @@ sed -n '793,821p' references/components.html | tr -d '\0'
 
 ## 6단계 — Appendix 보강
 
-5단계까지 완성된 본문 내용을 바탕으로, 논문의 **부록(Appendix) 데이터**를 읽고 각 섹션을 한층 더 깊이 있게 보강합니다. 부록 내용을 단순히 맨 아래에 잘라 붙이는 것이 **아닙니다**. 부록의 정보는 원래 있어야 할 본문의 위치로 찾아 들어가야 합니다.
+**Reference 또는 bibliography는 읽지 않고 부록(Appendix)으로 넘어가 읽습니다.**
+
+논문의 본문을 바탕으로 작성된 HTML에 **부록(Appendix) 데이터**를 바탕으로 각 섹션을 한층 더 깊이 있게 보강합니다.
+부록 내용을 단순히 맨 아래에 잘라 붙이는 것이 **아닙니다**. 부록의 정보는 원래 있어야 할 본문의 위치로 찾아 들어가야 합니다.
 
 - **수학적 완전성 확보**: 본문에 생략된 정리(Theorem)의 증명이나 복잡한 수학적 유도 과정이 부록에 있다면 찾아내어, 5단계에서 작성한 해당 수식의 해설 패널(`§2.2 수식 블록` 내부)에 `[Appendix 부연]`이라는 태그와 함께 추가합니다.
 - **구현 세부사항 통과**: 모델 재현에 꼭 필요한 추가 하이퍼파라미터 테이블 설정값, 데이터 파이프라인 처리 기법 등이 부록에 있다면, 이를 추출하여 "4d. 구현 세부사항" 영역에 병합합니다.
