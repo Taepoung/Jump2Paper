@@ -382,7 +382,7 @@ pdftoppm -jpeg -r 150 paper.pdf /tmp/page
 
 **절대로 거대한 Base64 문자열을 툴로 직접 붙여넣지 마십시오.** AI가 해당 내용을 다시 읽게 되어 성능을 저하시킵니다. 아래와 같이 Python을 활용해 대화 내역에 남지 않도록 삽입합니다.
 
-1.  **Placeholder 작성**: HTML을 구성할 때, 이미지 `src` 자리에 나중에 치환할 placeholder를 미리 적어둡니다.
+1.  **Placeholder 작성**: 이미지를 넣을 공간에 {{FIG_1_B64}}와 같은 placeholder를 미리 적어둡니다.
     *   예: `<img src="data:image/png;base64,{{FIG_1_B64}}" alt="Figure 1">`
 2.  **이미지 파일 확인**: `pdftoppm` 등으로 추출된 이미지 파일의 경로를 확인합니다.
 3.  **Python으로 직접 주입**: 아래 명령어를 실행하여 AI의 대화 내역에 Base64가 남지 않게 파일 시스템 상에서 직접 내용을 바꿉니다.
