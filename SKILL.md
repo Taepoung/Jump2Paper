@@ -376,9 +376,25 @@ pdftoppm -jpeg -r 150 paper.pdf /tmp/page
 ## 9단계 — 대용량 데이터 삽입 (원본 Figure / Table)
 
 7단계까지의 모든 내용 점검과 구조/UX 테스트가 끝난 후, HTML 용량을 크게 늘리는 **Figure 원본 렌더링을 가장 마지막 단계에서 수행합니다**. 
-미리 삽입할 경우 토큰이 비대해져 앞선 단계의 코드 수정 및 시각화 검증 작업이 지연되거나 실패할 수 있습니다.
+미리 삽입할 경우 토큰이 비대한 상태로 계속 읽게 되어 context window가 낭비되고 코드 수정 작업이 지연될 수 있습니다.
 
-**`cat >>`, `echo >>` 등 셸 리다이렉션을 사용하면 `</body>`, `</html>` 바깥에 내용을 붙여 HTML을 깨뜨릴 수 있으니 사용하지 않습니다**
+### Context-Safe 삽입 방식 (Placeholder 전략)
+
+**절대로 거대한 Base64 문자열을 `replace_file_content` 툴로 직접 붙여넣지 마십시오.** AI가 해당 내용을 다시 읽게 되어 성능을 저하시킵니다. 아래와 같이 Python을 활용해 대화 내역에 남지 않도록 "AI 모르게" 삽입합니다.
+
+1.  **Placeholder 작성**: 5~7단계에서 HTML을 구성할 때, 이미지 `src` 자리에 나중에 치환할 placeholder를 미리 적어둡니다.
+    *   예: `<img src="data:image/png;base64,{{FIG_1_B64}}" alt="Figure 1">`
+2.  **이미지 파일 확인**: `pdftoppm` 등으로 추출된 이미지 파일의 경로를 확인합니다.
+3.  **Python으로 직접 주입**: 아래 명령어를 실행하여 AI의 대화 내역에 Base64가 남지 않게 파일 시스템 상에서 직접 내용을 바꿉니다.
+
+```bash
+# 예시: figure1.png를 base64로 변환하여 {{FIG_1_B64}} placeholder 자리에 주입
+python -c "import base64; img_b64 = base64.b64encode(open('figure1.png', 'rb').read()).decode('utf-8'); content = open('paper.html', 'r', encoding='utf-8').read().replace('{{FIG_1_B64}}', img_b64); open('paper.html', 'w', encoding='utf-8').write(content)"
+```
+
+**주의: `cat >>`, `echo >>` 등 셸 리다이렉션을 사용하면 `</body>`, `</html>` 바깥에 내용을 붙여 HTML을 깨뜨릴 수 있으니 사용하지 않습니다.**
+
+---
 
 → 컴포넌트: `§2.4 [보충]/[평가] 뱃지` + (이전/이후 비교가 있는 figure → `§3.7 비교 슬라이더`) + (단계별 흐름 figure → `§3.4 스텝 플레이어`)
 
@@ -388,7 +404,7 @@ pdftoppm -jpeg -r 150 paper.pdf /tmp/page
 - **Figure**: 원본 표/그림 이미지를 base64로 렌더링하여 삽입
   ```html
   <figure>
-    <img src="data:image/jpeg;base64,BASE64_STRING" alt="Figure N">
+    <img src="data:image/jpeg;base64,{{FIG_N_B64}}" alt="Figure N">
     <figcaption>Figure N (논문 §섹션번호, p.페이지): 한 줄 요약</figcaption>
   </figure>
   ```
