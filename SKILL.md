@@ -67,10 +67,10 @@ argument-hint: "Language (e.g. 한국어, English)"
 ## 1단계 — HTML 초기화
 
 콘텐츠를 쓰기 전에 HTML 파일을 먼저 만듭니다.
-`references/` 경로는 **현재 작업 디렉토리 기준**입니다. SKILL.md가 있는 폴더에서 실행해야 합니다.
+`assets/` 경로는 **현재 작업 디렉토리 기준**입니다. SKILL.md가 있는 폴더에서 실행해야 합니다.
 
 ```bash
-sed -n '9,773p' references/components.html | tr -d '\0' > paper.html
+sed -n '9,773p' assets/components.html | tr -d '\0' > paper.html
 ```
 
 이때 HTML에는 CSS와 JS가 포함되어있습니다.
@@ -82,11 +82,11 @@ sed -n '9,773p' references/components.html | tr -d '\0' > paper.html
 
 **지금 `references/design_system.md`를 읽으세요.**
 
-작성 중에 필요한 것은 **컴포넌트 HTML**뿐입니다. `references/design_system.md`에서 컴포넌트 이름과 `components.html` 행 범위를 확인하고, bash로 추출해서 내용만 **Edit 툴을 활용해** 채웁니다.
+작성 중에 필요한 것은 **컴포넌트 HTML**뿐입니다. `references/design_system.md`에서 컴포넌트 이름에 대한 행 범위를 확인하고, bash로 추출해서 내용만 **Edit 툴을 활용해** 채웁니다.
 
 ```bash
 # 예: 수식 블록 (§2.2) 추출
-sed -n '793,821p' references/components.html | tr -d '\0'
+sed -n '793,821p' assets/components.html | tr -d '\0'
 ```
 
 시각화 패턴도 `references/design_system.md` §3 표에서 골라 동일하게 추출합니다. 시각화 섹션은 HTML + CSS + JS가 자체 완결되어 있으므로 추출 후 그대로 붙여넣습니다.
@@ -426,4 +426,3 @@ mv paper.html [슬러그].html
 | 파일 | 내용 | 언제 읽는가 |
 |---|---|---|
 | `references/design_system.md` | 색상·타이포 토큰, §2 기본 컴포넌트 위치(행), §3 시각화 패턴 위치(행), 인터랙티브 요소 선택 가이드 | **4단계**에서 한 번 읽고, 섹션 작성 중 컴포넌트를 고를 때마다 **최소한으로 재참조** |
-| `references/components.html` | 모든 HTML 템플릿 모음 (§1 PAGE SHELL + §2 기본 + §3 시각화) | **직접 읽지 않음** — bash `sed`로 필요한 행만 추출 |
