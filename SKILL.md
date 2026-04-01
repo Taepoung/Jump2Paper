@@ -82,7 +82,7 @@ sed -n '9,773p' references/components.html | tr -d '\0' > paper.html
 
 **지금 `references/design_system.md`를 읽으세요.**
 
-작성 중에 필요한 것은 **컴포넌트 HTML**뿐입니다. `references/design_system.md`에서 컴포넌트 이름과 `components.html` 행 범위를 확인하고, bash로 추출해서 내용만 채웁니다.
+작성 중에 필요한 것은 **컴포넌트 HTML**뿐입니다. `references/design_system.md`에서 컴포넌트 이름과 `components.html` 행 범위를 확인하고, bash로 추출해서 내용만 **Edit 툴을 활용해** 채웁니다.
 
 ```bash
 # 예: 수식 블록 (§2.2) 추출
@@ -132,6 +132,7 @@ pdftoppm -jpeg -r 150 paper.pdf /tmp/page
 ## 5단계 — 내용 작성
 
 읽은 논문의 본문을 바탕으로 추가적인 정보를 수집하면서 HTML 파일에 작성합니다.
+**`cat >>`, `echo >>` 등 셸 리다이렉션을 사용하면 `</body>`, `</html>` 바깥에 내용을 붙여 HTML을 깨뜨릴 수 있으니 사용하지 않습니다**
 
 인터랙티브 컴포넌트의 CSS/JS는 항상 별도 `<style>`/`<script>` 태그로 분리해서 추가합니다.
 
@@ -376,6 +377,8 @@ pdftoppm -jpeg -r 150 paper.pdf /tmp/page
 
 7단계까지의 모든 내용 점검과 구조/UX 테스트가 끝난 후, HTML 용량을 크게 늘리는 **Figure 원본 렌더링을 가장 마지막 단계에서 수행합니다**. 
 미리 삽입할 경우 토큰이 비대해져 앞선 단계의 코드 수정 및 시각화 검증 작업이 지연되거나 실패할 수 있습니다.
+
+**`cat >>`, `echo >>` 등 셸 리다이렉션을 사용하면 `</body>`, `</html>` 바깥에 내용을 붙여 HTML을 깨뜨릴 수 있으니 사용하지 않습니다**
 
 → 컴포넌트: `§2.4 [보충]/[평가] 뱃지` + (이전/이후 비교가 있는 figure → `§3.7 비교 슬라이더`) + (단계별 흐름 figure → `§3.4 스텝 플레이어`)
 
