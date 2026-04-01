@@ -70,7 +70,7 @@ argument-hint: "Language (e.g. 한국어, English)"
 `assets/` 경로는 **현재 작업 디렉토리 기준**입니다. SKILL.md가 있는 폴더에서 실행해야 합니다.
 
 ```bash
-sed -n '9,773p' assets/components.html | tr -d '\0' > paper.html
+sed -n '9,757p' assets/components.html | tr -d '\0' > paper.html
 ```
 
 이때 HTML에는 CSS와 JS가 포함되어있습니다.

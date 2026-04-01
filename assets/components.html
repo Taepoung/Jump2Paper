@@ -587,17 +587,6 @@
       border-color: var(--color-accent);
     }
 
-    /* ── 스크롤 리빌 애니메이션 ── */
-    .p2w-reveal {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-
-    .p2w-reveal.visible {
-      opacity: 1;
-      transform: none;
-    }
 
     /* ── 반응형 ── */
     @media (max-width: 600px) {
@@ -693,19 +682,19 @@
   </div>
 
   <!-- 섹션: 홀수=흰 배경, 짝수=소프트 배경 교대 -->
-  <section class="p2w-section p2w-reveal" id="background">
+  <section class="p2w-section" id="background">
     <div class="p2w-content">
       <h2>문제의 배경 — 기존 연구의 한계</h2>
     </div>
   </section>
 
-  <section class="p2w-section p2w-section-alt p2w-reveal" id="idea">
+  <section class="p2w-section p2w-section-alt" id="idea">
     <div class="p2w-content">
       <h2>이 논문의 선택 — 핵심 아이디어와 트레이드오프</h2>
     </div>
   </section>
 
-  <section class="p2w-section p2w-reveal" id="method">
+  <section class="p2w-section" id="method">
     <div class="p2w-content">
       <h2>방법론</h2>
       <h3>전체 아키텍처</h3>
@@ -718,25 +707,25 @@
     </div>
   </section>
 
-  <section class="p2w-section p2w-section-alt p2w-reveal" id="results">
+  <section class="p2w-section p2w-section-alt" id="results">
     <div class="p2w-content">
       <h2>결과</h2>
     </div>
   </section>
 
-  <section class="p2w-section p2w-reveal" id="limits">
+  <section class="p2w-section" id="limits">
     <div class="p2w-content">
       <h2>한계점 & 트레이드오프</h2>
     </div>
   </section>
 
-  <section class="p2w-section p2w-section-alt p2w-reveal" id="impact">
+  <section class="p2w-section p2w-section-alt" id="impact">
     <div class="p2w-content">
       <h2>영향력 & 후속 연구</h2>
     </div>
   </section>
 
-  <section class="p2w-section p2w-reveal" id="qa">
+  <section class="p2w-section" id="qa">
     <div class="p2w-content">
       <h2>Q&A — 연구자의 고민과 독자의 질문</h2>
     </div>
@@ -751,11 +740,6 @@
       el.style.width = (window.scrollY / total * 100) + '%';
     });
 
-    // ── 스크롤 리빌 ──
-    const revealObserver = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.08 });
-    document.querySelectorAll('.p2w-reveal').forEach(el => revealObserver.observe(el));
 
     // ── 내비게이션 활성 섹션 추적 ──
     const navObserver = new IntersectionObserver(entries => {
@@ -791,7 +775,7 @@
 <!-- §2.1 END -->
 
 <!-- §2.2 수식 블록 (변수 테이블 + 해설 항상 표시) -->
-<div class="p2w-equation p2w-reveal">
+<div class="p2w-equation">
   <div class="p2w-equation-body">
     \[ 수식 \]
   </div>
