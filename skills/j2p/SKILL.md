@@ -2,7 +2,7 @@
 
 name: j2p
 description: "Use this skill whenever the user wants to convert an academic paper into an interactive web page. Trigger on phrases like '논문 웹으로 만들어줘', 'paper to web', 'paper2web', '논문 HTML로', '논문 시각화 페이지', '인터랙티브 논문 페이지', or when a user shares a PDF, arXiv link, or LaTeX source and wants it turned into a readable page. Use even if the user says 'summarize this paper' and seems to want a polished, shareable result rather than a plain text summary."
-argument-hint: "Language (e.g. 한국어, English)"
+argument-hint: "[filename.pdf] [Language (e.g. 한국어, English)]"
 
 ---
 
@@ -81,36 +81,30 @@ sed -n '9,757p' skills/j2p/assets/components.html | tr -d '\0' > paper.html
 
 **지금 `skills/j2p/references/design_system.md`를 읽으세요.**
 
-작성 중에 필요한 것은 **컴포넌트 HTML**뿐입니다. `skills/j2p/references/design_system.md`에서 컴포넌트 이름에 대한 행 범위를 확인하고, bash로 추출해서 내용만 **Edit 툴을 활용해** 채웁니다.
+컴포넌트가 필요한 위치에 도달하면, `skills/j2p/references/design_system.md`에서 해당 컴포넌트의 행 범위를 확인하고 Python으로 paper.html의 해당 줄에 직접 삽입합니다. 컴포넌트 내용은 컨텍스트에 들어오지 않습니다.
 
 ```bash
-# 예: 수식 블록 (§2.2) 추출
-sed -n '793,821p' skills/j2p/assets/components.html | tr -d '\0'
+# python scripts/insert_component.py <start> <end> <insert_after> [target]
+# 예: 수식 블록 (§2.2, 793~821행)을 paper.html 42번 줄 뒤에 삽입
+python skills/j2p/scripts/insert_component.py 793 821 42
 ```
 
-시각화 패턴도 `skills/j2p/references/design_system.md` §3 표에서 골라 동일하게 추출합니다. 시각화 섹션은 HTML + CSS + JS가 자체 완결되어 있으므로 추출 후 그대로 붙여넣습니다.
+삽입 후 **Edit 툴로 placeholder 텍스트만 채웁니다.** 시각화 컴포넌트(§3)도 동일하게 삽입하며, HTML + CSS + JS가 자체 완결되어 있으므로 내용만 교체하면 됩니다.
 
 ---
 
 ## 3단계 — 논문 파싱
 
-### 입력 유형 별 처리
+### 입력 유형 결정
 
-논문(PDF / LaTeX 소스) 중 하나가 제공되지 않았으면 먼저 요청하고 진행합니다.
+인자와 업로드 파일을 확인해 입력 유형을 판단합니다:
 
-#### PDF 업로드
-사용자가 `.pdf` 파일을 업로드하면 `/mnt/user-data/uploads/` 경로에 있습니다.
-```bash
-pdfinfo paper.pdf
-pdftotext -layout paper.pdf /tmp/paper.txt
-# 그림, 결과 표가 있는 페이지를 래스터화
-pdftoppm -jpeg -r 150 paper.pdf /tmp/page
-```
-
-#### LaTeX 소스
-`main.tex`을 읽고 `\title`, `\abstract`, `\section`, `\begin{equation}`, 그림에 집중하세요.
-
-**Reference 또는 bibliography 부분 전까지만 읽고 다음 단계로 넘어갑니다**
+| 조건 | 처리 |
+|---|---|
+| 파일명 인자 있음 (`.pdf`) | `python skills/j2p/scripts/parse_pdf.py filename.pdf` → `/tmp/paper_main.txt`, `/tmp/paper_appendix.txt`, `/tmp/fig_main-*.jpg`, `/tmp/fig_appendix-*.jpg` 생성 |
+| 파일명 인자 있음 (`.tex`) | `main.tex` 읽기 — `\title` `\abstract` `\section` `\begin{equation}` 그림에 집중, bibliography 전까지만 |
+| 인자 없음 | 앱 업로드 파일 확장자로 판단 후 위 처리 적용 |
+| 인자 없음 + 업로드 없음 | 사용자에게 파일 요청 후 재시작 |
 
 ---
 
@@ -130,9 +124,9 @@ pdftoppm -jpeg -r 150 paper.pdf /tmp/page
 
 ## 5단계 — 내용 작성
 
-읽은 논문의 본문을 바탕으로 추가적인 정보를 수집하면서 HTML 파일에 작성합니다.
-**`cat >>`, `echo >>` 등 셸 리다이렉션을 사용하면 `</body>`, `</html>` 바깥에 내용을 붙여 HTML을 깨뜨릴 수 있으니 사용하지 않습니다**
-
+**`/tmp/paper_main.txt`를 읽고** 내용을 작성합니다. (LaTeX의 경우 `main.tex`)
+Figure가 필요한 섹션에서는 `/tmp/fig_main-*.jpg`를 참조합니다.
+추가적인 정보를 수집하면서 HTML 파일에 작성합니다.
 인터랙티브 컴포넌트의 CSS/JS는 항상 별도 `<style>`/`<script>` 태그로 분리해서 추가합니다.
 
 내용을 작성할 때 챙겨야 할 공통 항목:
@@ -321,7 +315,9 @@ pdftoppm -jpeg -r 150 paper.pdf /tmp/page
 
 ## 6단계 — Appendix 보강
 
-**Reference 또는 bibliography는 읽지 않고 부록(Appendix)으로 넘어가 읽습니다.**
+**`/tmp/paper_appendix.txt`를 읽고** 각 섹션을 보강합니다. (LaTeX의 경우 `main.tex`의 `\appendix` 이후)
+Figure가 필요한 경우 `/tmp/fig_appendix-*.jpg`를 참조합니다.
+`paper_appendix.txt`가 비어 있으면 이 단계는 건너뜁니다.
 
 논문의 본문을 바탕으로 작성된 HTML에 **부록(Appendix) 데이터**를 바탕으로 각 섹션을 한층 더 깊이 있게 보강합니다.
 부록 내용을 단순히 맨 아래에 잘라 붙이는 것이 **아닙니다**. 부록의 정보는 원래 있어야 할 본문의 위치로 찾아 들어가야 합니다.
@@ -381,17 +377,15 @@ pdftoppm -jpeg -r 150 paper.pdf /tmp/page
 
 **절대로 거대한 Base64 문자열을 툴로 직접 붙여넣지 마십시오.** AI가 해당 내용을 다시 읽게 되어 성능을 저하시킵니다. 아래와 같이 Python을 활용해 대화 내역에 남지 않도록 삽입합니다.
 
-1.  **Placeholder 작성**: 이미지를 넣을 공간에 {{FIG_1_B64}}와 같은 placeholder를 미리 적어둡니다.
-    *   예: `<img src="data:image/png;base64,{{FIG_1_B64}}" alt="Figure 1">`
-2.  **이미지 파일 확인**: `pdftoppm` 등으로 추출된 이미지 파일의 경로를 확인합니다.
-3.  **Python으로 직접 주입**: 아래 명령어를 실행하여 AI의 대화 내역에 Base64가 남지 않게 파일 시스템 상에서 직접 내용을 바꿉니다.
+1.  **Placeholder 작성**: 이미지를 넣을 공간에 `{{FIG_1_B64}}`와 같은 placeholder를 미리 적어둡니다.
+    *   예: `<img src="data:image/jpeg;base64,{{FIG_1_B64}}" alt="Figure 1">`
+2.  **이미지 파일 확인**: 3단계에서 추출된 `/tmp/fig_main-*.jpg` 파일 경로를 확인합니다.
+3.  **Python으로 직접 주입**: 대화 내역에 Base64가 남지 않도록 파일 시스템에서 직접 치환합니다.
 
 ```bash
-# 예시: figure1.png를 base64로 변환하여 {{FIG_1_B64}} placeholder 자리에 주입
-python -c "import base64; img_b64 = base64.b64encode(open('figure1.png', 'rb').read()).decode('utf-8'); content = open('paper.html', 'r', encoding='utf-8').read().replace('{{FIG_1_B64}}', img_b64); open('paper.html', 'w', encoding='utf-8').write(content)"
+# python skills/j2p/scripts/inject_figure.py <image_path> <placeholder> [target]
+python skills/j2p/scripts/inject_figure.py /tmp/fig_main-000.jpg {{FIG_1_B64}}
 ```
-
-**주의: `cat >>`, `echo >>` 등 셸 리다이렉션을 사용하면 `</body>`, `</html>` 바깥에 내용을 붙여 HTML을 깨뜨릴 수 있으니 사용하지 않습니다.**
 
 ---
 
