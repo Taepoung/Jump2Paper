@@ -1,33 +1,35 @@
 {
-    "PostToolUse": [
-        {
-            "matcher": "Write|Edit",
-            "hooks": [
-                {
-                    "type": "command",
-                    "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_output.py"
-                }
-            ]
-        }
-    ],
-    "PreToolUse": [
-        {
-            "matcher": "Bash",
-            "hooks": [
-                {
-                    "type": "command",
-                    "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/block_html_redirect.py"
-                }
-            ]
-        },
-        {
-            "matcher": "Write|Edit",
-            "hooks": [
-                {
-                    "type": "command",
-                    "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/block_base64_write.py"
-                }
-            ]
-        }
-    ]
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Write|Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_output.py"
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/block_html_redirect.py"
+                    }
+                ]
+            },
+            {
+                "matcher": "Write|Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/block_base64_write.py"
+                    }
+                ]
+            }
+        ]
+    }
 }
