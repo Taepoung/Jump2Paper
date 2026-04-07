@@ -89,7 +89,7 @@ sed -n '9,757p' skills/j2p/assets/components.html | tr -d '\0' > paper.html
 python skills/j2p/scripts/insert_component.py 793 821 42
 ```
 
-삽입 후 **Edit 툴로 placeholder 텍스트만 채웁니다.** 시각화 컴포넌트(§3)도 동일하게 삽입하며, HTML + CSS + JS가 자체 완결되어 있으므로 내용만 교체하면 됩니다.
+삽입 후 **Edit 툴로 내용을 채웁니다.** 시각화 컴포넌트(§3)도 동일하게 삽입하며, HTML + CSS + JS가 자체 완결되어 있으므로 내용만 교체하면 됩니다.
 
 ---
 
@@ -402,8 +402,8 @@ Table은 원본 이미지 삽입 (HTML 재구성은 5단계에서 기처리)
 
 ```bash
 # python skills/j2p/scripts/inject_figure.py <image_path> <placeholder> [target]
-python skills/j2p/scripts/inject_figure.py /tmp/fig_main-000.jpg {{FIG_1_B64}}
-python skills/j2p/scripts/inject_figure.py /tmp/fig_appendix-000.jpg {{FIG_A1_B64}}
+python skills/j2p/scripts/inject_figure.py /tmp/fig_main-001.jpg {{FIG_1_B64}}
+python skills/j2p/scripts/inject_figure.py /tmp/fig_appendix-001.jpg {{FIG_A1_B64}}
 ```
 
 ---
