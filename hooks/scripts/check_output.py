@@ -32,6 +32,8 @@ def main():
     issues = []
     issues.extend(check_js(content))
     issues.extend(check_latex(content))
+    issues.extend(check_duplicate_ids(content))
+    issues.extend(check_local_refs(content))
 
     if issues:
         print("=== [자동 검토] 출력 파일에서 오류가 발견되었습니다. 즉시 수정하세요. ===")
@@ -153,34 +155,42 @@ def _check_bracket_balance(code: str, label: str) -> str | None:
 
 
 def _has_unclosed_template(code: str) -> bool:
-    """백틱 쌍이 맞는지 확인 (중첩/이스케이프 미지원, 단순 홀수 카운트)."""
+    """백틱 쌍이 맞는지 확인. 일반 문자열 내부의 백틱은 무시."""
+    in_str = None
     count = 0
     i = 0
     while i < len(code):
-        if code[i] == "\\" and i + 1 < len(code):
+        ch = code[i]
+        if in_str and ch == "\\" and i + 1 < len(code):
             i += 2
             continue
-        if code[i] == "`":
+        if in_str:
+            if ch == in_str:
+                in_str = None
+        elif ch in ('"', "'"):
+            in_str = ch
+        elif ch == "`":
             count += 1
         i += 1
     return count % 2 != 0
 
 
 def _has_unclosed_string(code: str) -> str | None:
-    """미종료 문자열 감지. 닫히지 않은 따옴표 종류 반환."""
-    for quote in ('"', "'"):
-        count = 0
-        i = 0
-        while i < len(code):
-            if code[i] == "\\" and i + 1 < len(code):
-                i += 2
-                continue
-            if code[i] == quote:
-                count += 1
-            i += 1
-        if count % 2 != 0:
-            return quote
-    return None
+    """미종료 문자열 감지. 다른 따옴표 안의 따옴표는 무시. 닫히지 않은 따옴표 종류 반환."""
+    in_str = None
+    i = 0
+    while i < len(code):
+        ch = code[i]
+        if in_str and ch == "\\" and i + 1 < len(code):
+            i += 2
+            continue
+        if in_str:
+            if ch == in_str:
+                in_str = None
+        elif ch in ('"', "'"):
+            in_str = ch
+        i += 1
+    return in_str
 
 
 # ─── LaTeX 오염 검사 ─────────────────────────────────────────────────────────
@@ -225,8 +235,7 @@ def check_latex(content: str) -> list[str]:
         if not matches:
             continue
 
-        # 처음 3건만 보고
-        for m in matches[:3]:
+        for m in matches:
             start = max(0, m.start() - 25)
             end = min(len(math_content), m.end() + 25)
             ctx = repr(math_content[start:end])
@@ -236,12 +245,32 @@ def check_latex(content: str) -> list[str]:
                 f"  → 해당 수식의 백슬래시 명령어를 원문에서 다시 확인하고 수정하세요."
             )
 
-        if len(matches) > 3:
-            issues.append(
-                f"[LaTeX 오염] 위 패턴이 추가로 {len(matches) - 3}곳 더 발견됨"
-            )
-
     return issues
+
+
+# ─── ID 중복 검사 ─────────────────────────────────────────────────────────────
+
+def check_duplicate_ids(content: str) -> list[str]:
+    ids = re.findall(r'\bid=["\']([^"\']+)["\']', content)
+    seen, dupes = set(), set()
+    for id_ in ids:
+        if id_ in seen:
+            dupes.add(id_)
+        seen.add(id_)
+    return [f"[ID 중복] id=\"{id_}\" 가 중복됩니다" for id_ in sorted(dupes)]
+
+
+# ─── 로컬 파일 참조 검사 ──────────────────────────────────────────────────────
+
+_LOCAL_REF_RE = re.compile(
+    r'(?:src|href)=["\'](?!\s*https?://|//|data:|#)([^"\']+)["\']',
+    re.IGNORECASE,
+)
+
+def check_local_refs(content: str) -> list[str]:
+    matches = _LOCAL_REF_RE.findall(content)
+    local = [m for m in matches if m.startswith(("./", "../")) or re.search(r'\.\w{2,4}$', m)]
+    return [f"[로컬 참조] 단일 파일 완결성 위반 — \"{ref}\"" for ref in local]
 
 
 if __name__ == "__main__":

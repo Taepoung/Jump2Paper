@@ -6,7 +6,7 @@ argument-hint: "[filename.pdf] [Language (e.g. 한국어, English)]"
 
 ---
 
-# Paper2Web 스킬
+# Jump2Paper 스킬
 
 학술 논문을 하나의 자체 완결형 인터랙티브 HTML 페이지로 변환합니다.
 논문의 핵심 아이디어와 스토리를 중심으로, 입문자부터 전문가까지 모두가
@@ -84,7 +84,7 @@ sed -n '9,757p' skills/j2p/assets/components.html | tr -d '\0' > paper.html
 컴포넌트가 필요한 위치에 도달하면, `skills/j2p/references/design_system.md`에서 해당 컴포넌트의 행 범위를 확인하고 Python으로 paper.html의 해당 줄에 직접 삽입합니다. 컴포넌트 내용은 컨텍스트에 들어오지 않습니다.
 
 ```bash
-# python scripts/insert_component.py <start> <end> <insert_after> [target]
+# python skills/j2p/scripts/insert_component.py <start> <end> <insert_after> [target]
 # 예: 수식 블록 (§2.2, 793~821행)을 paper.html 42번 줄 뒤에 삽입
 python skills/j2p/scripts/insert_component.py 793 821 42
 ```
@@ -263,7 +263,7 @@ Figure가 필요한 섹션에서는 `/tmp/fig_main-*.jpg`를 참조합니다.
 5. **결과 — 수치 비교 & 차트**
     → 컴포넌트: `§2.6 결과 테이블` + `§3.8 Chart.js 차트` + `§3.13 메트릭 카드`
 
-    주요 실험 수치를 **HTML로 재구성**하는 섹션입니다. 원본 이미지 보존(Base64)은 토큰 및 용량 문제로 모든 점검이 끝난 뒤 **8단계**에서 수행합니다.
+    주요 실험 수치를 **HTML로 재구성**하는 섹션입니다. 원본 이미지 보존(Base64)은 토큰 및 용량 문제로 모든 점검이 끝난 뒤 **9단계**에서 수행합니다.
 
     - **비교 테이블** (§2.6): 제안 방법 vs 기존 방법 수치 비교
       - 제안 방법 행 → `highlight` 클래스 (초록 강조) + `p2w-badge-positive` "Ours"
@@ -357,9 +357,7 @@ Figure가 필요한 경우 `/tmp/fig_appendix-*.jpg`를 참조합니다.
 
 ## 8단계 — 완결성 및 치명적 UX 오류 점검
 
-- [ ] **단일 HTML 완결성**: 로컬 파일 참조 없이 단일 파일로 더블클릭 실행 시, 모든 화면 요소와 CDN 기능이 정상 작동함
 - [ ] **콘텐츠 누락 없음**: 논문의 수식·그림·표가 모두 포함되었으며, 아키텍처 핵심 구조와 트레이드오프 서술이 누락되지 않음
-- [ ] **ID 및 변수 충돌 방지 (중요)**: 페이지 내 `id` (SVG `<marker>`, canvas 등) 중복이나 JS 요소 `null` 참조로 인한 기능 먹통 현상이 전혀 없음
 - [ ] **전역 스타일 캡슐화**: 각 컴포넌트에 적용된 CSS 스타일이나 JS가 페이지의 전체 레이아웃 구성(여백, 헤딩 등)을 오염시키거나 망가뜨리지 않음
 - [ ] **레이아웃 깨짐 / 이탈 방지**: 모바일 뷰(`max-width: 600px`)에서 표/수식이 가로로 잘리거나, 호버 툴팁 요소가 화면 밖으로 벗어나지 않음
 - [ ] **읽기 흐름 방해 금지**: 중요한 수식·해설이 클릭 요소 뒤에 심하게 감춰지거나, 독자의 시선을 방해하는 강제 자동 애니메이션이 없음
@@ -368,46 +366,45 @@ Figure가 필요한 경우 `/tmp/fig_appendix-*.jpg`를 참조합니다.
 
 ---
 
-## 9단계 — 대용량 데이터 삽입 (원본 Figure / Table)
+## 9단계 — 원본 Figure / Table 삽입
 
-7단계까지의 모든 내용 점검과 구조/UX 테스트가 끝난 후, HTML 용량을 크게 늘리는 **Figure 원본 렌더링을 가장 마지막 단계에서 수행합니다**. 
-미리 삽입할 경우 토큰이 비대한 상태로 계속 읽게 되어 context window가 낭비되고 코드 수정 작업이 지연될 수 있습니다.
+8단계까지 모든 점검이 끝난 후 수행합니다.
 
-### Context-Safe 삽입 방식 (Placeholder 전략)
+### 1. HTML 섹션 구성
 
-**절대로 거대한 Base64 문자열을 툴로 직접 붙여넣지 마십시오.** AI가 해당 내용을 다시 읽게 되어 성능을 저하시킵니다. 아래와 같이 Python을 활용해 대화 내역에 남지 않도록 삽입합니다.
+논문의 모든 figure/table을 원본 그대로 보존합니다.
 
-1.  **Placeholder 작성**: 이미지를 넣을 공간에 `{{FIG_1_B64}}`와 같은 placeholder를 미리 적어둡니다.
-    *   예: `<img src="data:image/jpeg;base64,{{FIG_1_B64}}" alt="Figure 1">`
-2.  **이미지 파일 확인**: 3단계에서 추출된 `/tmp/fig_main-*.jpg` 파일 경로를 확인합니다.
-3.  **Python으로 직접 주입**: 대화 내역에 Base64가 남지 않도록 파일 시스템에서 직접 치환합니다.
+컴포넌트: `§2.4 [보충]/[평가] 뱃지` + (이전/이후 비교 → `§3.7 비교 슬라이더`) + (단계별 흐름 → `§3.4 스텝 플레이어`)
+
+각 figure 위치에 placeholder 구조를 Edit 툴로 작성합니다.
+
+**Placeholder 규칙**: `{{FIG_N_B64}}` — N은 논문의 Figure 번호 (예: `{{FIG_1_B64}}`, `{{FIG_2_B64}}`)
+
+```html
+<figure>
+  <img src="data:image/jpeg;base64,{{FIG_N_B64}}" alt="Figure N">
+  <figcaption>Figure N (§섹션, p.페이지): 한 줄 요약</figcaption>
+</figure>
+```
+base64 추출 불가 시 — 텍스트로 도표 재현하거나 `[Figure N: 원본 이미지 추출 불가]` 명시
+
+Table은 원본 이미지 삽입 (HTML 재구성은 5단계에서 기처리)
+
+모든 figure/table 아래 해설 단락 필수:
+- **논문 내 위치**: 몇 섹션, 몇 페이지
+- **무엇을 보여주는가**: 목적과 내용
+- **주목할 포인트**: 놓치지 말아야 할 수치·패턴·비교
+- **논문 주장과의 연결**: 어떤 주장을 뒷받침하는가
+
+### 2. Base64 주입
+
+3단계에서 추출된 `/tmp/fig_main-*.jpg` (본문) 및 `/tmp/fig_appendix-*.jpg` (부록) 경로를 확인하고 스크립트로 주입합니다. Write/Edit 툴로 직접 삽입하면 훅이 자동 차단합니다.
 
 ```bash
 # python skills/j2p/scripts/inject_figure.py <image_path> <placeholder> [target]
 python skills/j2p/scripts/inject_figure.py /tmp/fig_main-000.jpg {{FIG_1_B64}}
+python skills/j2p/scripts/inject_figure.py /tmp/fig_appendix-000.jpg {{FIG_A1_B64}}
 ```
-
----
-
-→ 컴포넌트: `§2.4 [보충]/[평가] 뱃지` + (이전/이후 비교가 있는 figure → `§3.7 비교 슬라이더`) + (단계별 흐름 figure → `§3.4 스텝 플레이어`)
-
-논문의 모든 figure/table을 **원본 그대로** 보존하는 섹션입니다.
-독자가 이 섹션을 보고 원본 논문의 어느 부분을 펴야 할지 바로 알 수 있어야 합니다.
-
-- **Figure**: 원본 표/그림 이미지를 base64로 렌더링하여 삽입
-  ```html
-  <figure>
-    <img src="data:image/jpeg;base64,{{FIG_N_B64}}" alt="Figure N">
-    <figcaption>Figure N (논문 §섹션번호, p.페이지): 한 줄 요약</figcaption>
-  </figure>
-  ```
-  base64 추출 불가 시 — 텍스트로 도표 재현하거나 "[Figure N: 원본 이미지 추출 불가]" 명시
-- **Table**: 원본 이미지 삽입 (HTML 재구성은 5단계에서 기처리)
-- 모든 figure/table 아래 **반드시** 해설 단락을 작성합니다:
-  - **논문 내 위치**: 몇 섹션, 몇 페이지에 있는가 — 독자가 원본에서 바로 찾을 수 있도록 명시
-  - **무엇을 보여주는가**: 이 그림/표의 목적과 내용을 설명
-  - **주목할 포인트**: 수치·패턴·비교에서 독자가 놓치지 말아야 할 것
-  - **논문 주장과의 연결**: 이 그림/표가 논문의 어떤 주장을 뒷받침하는가
 
 ---
 
